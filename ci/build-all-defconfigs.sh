@@ -85,11 +85,19 @@ for i in ${DEFCONFIGS[@]}; do
         ./buildroot/utils/config --file $O/.config --set-str BR2_CCACHE_DIR $CCACHE_DIR
 	if [ -d "$SDK_DIR" ]; then
 	    ./buildroot/utils/config --file $O/.config --set-val BR2_TOOLCHAIN_EXTERNAL y
-	    ./buildroot/utils/config --file $O/.config --set-str BR2_TOOLCHAIN_EXTERNAL_PATH $SDK_DIR
 	    ./buildroot/utils/config --file $O/.config --set-val BR2_TOOLCHAIN_EXTERNAL_CUSTOM_GLIBC y
 	    ./buildroot/utils/config --file $O/.config --set-val BR2_TOOLCHAIN_EXTERNAL_CXX y
-	    # FIXME: How do we work this out programatically?
-	    ./buildroot/utils/config --file $O/.config --set-val BR2_TOOLCHAIN_EXTERNAL_GCC_6 y
+
+        IS_P8=$(./buildroot/utils/config --file $O/.config --state BR2_OPENPOWER_POWER8)
+
+        # FIXME: How do we work this out programatically for each individual config?
+        if [[ ! -n ${IS_P8} ]]; then
+            ./buildroot/utils/config --file $O/.config --set-val BR2_TOOLCHAIN_EXTERNAL_GCC_8 y
+            ./buildroot/utils/config --file $O/.config --set-str BR2_TOOLCHAIN_EXTERNAL_PATH $SDK_DIR/p9
+        else
+            ./buildroot/utils/config --file $O/.config --set-val BR2_TOOLCHAIN_EXTERNAL_GCC_6 y
+            ./buildroot/utils/config --file $O/.config --set-str BR2_TOOLCHAIN_EXTERNAL_PATH $SDK_DIR/p8
+        fi
 
 	    KERNEL_VER=$(./buildroot/utils/config --file $O/.config --state BR2_LINUX_KERNEL_CUSTOM_VERSION_VALUE)
 	    echo "KERNEL_VER " $KERNEL_VER

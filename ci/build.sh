@@ -131,7 +131,9 @@ EOF
 	    if [ ! -d "$SDK_DIR" ]; then
 		chmod +x ci/build-sdk.sh
 		run_docker openpower/op-build-$distro "./ci/build-sdk.sh $distro witherspoon_defconfig"
-		mv output-$distro-witherspoon_defconfig $SDK_DIR
+    mv output-$distro-witherspoon_defconfig $SDK_DIR/p9/
+    run_docker openpower/op-build-$distro "./ci/build-sdk.sh $distro habanero_defconfig"
+    mv output-$distro-habanero_defconfig $SDK_DIR/p8/
 		$SDK_DIR/host/relocate-sdk.sh
 	    fi
 	    sdk_args="-s $SDK_DIR/host"
